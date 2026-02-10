@@ -309,6 +309,30 @@
           "channel_n": 8
         }
       ]
+    },
+    "25": {
+      "res_id": "deck.2023_04_17",
+      "name": "deck_2",
+      "pyname": "deck_2",
+      "enabled": true,
+      "coord_sys": -1,
+      "x": 0.814,
+      "y": 0.0,
+      "z": 0.0,
+      "rot": 0.0,
+      "channels": []
+    },
+    "26": {
+      "res_id": "deck.2023_04_17",
+      "name": "deck_3",
+      "pyname": "deck_3",
+      "enabled": true,
+      "coord_sys": -1,
+      "x": 1.628,
+      "y": 0.0,
+      "z": 0.0,
+      "rot": 0.0,
+      "channels": []
     }
   },
   "locations": {

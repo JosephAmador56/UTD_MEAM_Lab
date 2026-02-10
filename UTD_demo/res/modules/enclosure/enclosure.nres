@@ -1,0 +1,22 @@
+{
+  "res_id": "enclosure.2024_05_05",
+  "name": "Enclosure",
+  "py_name": "enclosure",
+  "type": "static",
+  "subtype": "None",
+  "grid": null,
+  "tool": "None",
+  "defaults": {
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "rot": 0
+  },
+  "links": {
+    "enclosure": {
+      "obj_name": "enclosure.obj",
+      "joint_settings": "base",
+      "mates": {}
+    }
+  }
+}
