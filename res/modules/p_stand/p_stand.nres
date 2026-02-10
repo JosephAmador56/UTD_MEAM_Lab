@@ -1,0 +1,22 @@
+{
+  "res_id": "p_stand.2025_02_20",
+  "name": "Pipette rack stand",
+  "py_name": "p_stand",
+  "type": "static",
+  "subtype": "None",
+  "grid": null,
+  "tool": "None",
+  "defaults": {
+    "x": 0.075,
+    "y": -0.225,
+    "z": 0.0,
+    "rot": 0
+  },
+  "links": {
+    "p_stand": {
+      "obj_name": "p_stand.obj",
+      "joint_settings": "base",
+      "mates": {}
+    }
+  }
+}
