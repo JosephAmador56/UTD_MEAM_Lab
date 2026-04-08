@@ -27,7 +27,7 @@ void loop() {
     Serial.println("Left button pressed");
     rackMotor.move(-800); // Move left by 800 microsteps
   }
-  if (digitalRead(RACK_RIGHT_BTN) == HIGH) {
+  else if (digitalRead(RACK_RIGHT_BTN) == HIGH) {
     Serial.println("Right button pressed");
     rackMotor.move(800); // Move right by 800 microsteps
   }
