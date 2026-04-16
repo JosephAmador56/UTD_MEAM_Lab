@@ -58,8 +58,23 @@ void loop() {
 }
 
 int waitReadInt() {
-  while (Serial.available() == 0) {
-    // wait for input
+  String input = "";
+
+  while (true) {
+    if (Serial.available()) {
+      char c = Serial.read();
+
+      // Enter key pressed
+      if (c == '\n') {
+        break;
+      }
+
+      // ignore carriage return
+      if (c != '\r') {
+        input += c;
+      }
+    }
   }
-  return Serial.parseInt();
+
+  return input.toInt();
 }
