@@ -23,9 +23,9 @@ void setup() {
 
 void loop() {
   Serial.println("Please selected an option:");
-  Serial.println("1. Move left");
-  Serial.println("2. Move right");
-  Serial.println("3. Move x microsteps");
+  Serial.println("1. Move left 800 microsteps");
+  Serial.println("2. Move right 800 microsteps");
+  Serial.println("3. Move X microsteps");
 
   int choice = waitnReadInt();
 
