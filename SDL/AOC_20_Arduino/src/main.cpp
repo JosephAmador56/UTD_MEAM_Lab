@@ -13,6 +13,8 @@ DRV8834 rackMotor(RACK_STEPS, RACK_DIR_PIN, RACK_STEP_PIN);
 
 #define LED_PIN 13
 
+int waitReadInt();
+
 void setup() {
   Serial.begin(9600);
   rackMotor.begin(RACK_RPM, MICROSTEPS); 
@@ -27,31 +29,35 @@ void loop() {
   Serial.println("2. Move right 800 microsteps");
   Serial.println("3. Move X microsteps");
 
-  int choice = waitnReadInt();
+  int choice = waitReadInt();
 
   switch (choice) {
-    case 1:
+    case 1:{
       Serial.println("Moving left...");
       rackMotor.move(-800); // Move left by 800 microsteps
       break;
-    case 2:
+    }
+    case 2:{
       Serial.println("Moving right...");
       rackMotor.move(800); // Move right by 800 microsteps
       break;
-    case 3:
+    }
+    case 3:{
       Serial.println("Enter number of microsteps to move (positive for right, negative for left):");
-      int steps = waitnReadInt();
+      int steps = waitReadInt();
       Serial.print("Moving ");
       Serial.print(steps);
       Serial.println(" microsteps...");
       rackMotor.move(steps);
       break;
-    default:
+    }
+    default:{
       Serial.println("Invalid option. Please try again.");
+    }
   }
 }
 
-int waitnReadInt() {
+int waitReadInt() {
   while (Serial.available() == 0) {
     // wait for input
   }
