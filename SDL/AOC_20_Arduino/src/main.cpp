@@ -51,12 +51,14 @@ void loop() {
       Serial.println("Movi1ng left...");
       rackMotor.move(-800); // Move left by 800 microsteps
       zAxisMotor.move(-800); 
+      plungerMotor.move(-800); 
       break;
     }
     case 2:{
       Serial.println("Moving right...");
       rackMotor.move(800); // Move right by 800 microsteps
       zAxisMotor.move(800);
+      plungerMotor.move(800); 
       break;
     }
     case 3:{
@@ -67,6 +69,7 @@ void loop() {
       Serial.println(" microsteps...");
       rackMotor.move(steps);
       zAxisMotor.move(steps);
+      plungerMotor.move(steps);
       break;
     }
     default:{
