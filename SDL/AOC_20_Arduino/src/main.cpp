@@ -6,10 +6,22 @@
 #define RACK_STEP_PIN 9
 #define RACK_RPM 30
 
+#define Z_AXIS_STEPS 200
+#define Z_AXIS_DIR_PIN 12
+#define Z_AXIS_STEP_PIN 10
+#define Z_AXIS_RPM 30
+
+#define PLUNGER_STEPS 200
+#define PLUNGER_DIR_PIN 13
+#define PLUNGER_STEP_PIN 11
+#define PLUNGER_RPM 30
+
 // Board is 1/4 microstepping by default
 #define MICROSTEPS 4
 
 DRV8834 rackMotor(RACK_STEPS, RACK_DIR_PIN, RACK_STEP_PIN);
+DRV8834 zAxisMotor(Z_AXIS_STEPS, Z_AXIS_DIR_PIN, Z_AXIS_STEP_PIN);
+DRV8834 plungerMotor(PLUNGER_STEPS, PLUNGER_DIR_PIN, PLUNGER_STEP_PIN);
 
 #define LED_PIN 13
 
@@ -18,6 +30,9 @@ int waitReadInt();
 void setup() {
   Serial.begin(9600);
   rackMotor.begin(RACK_RPM, MICROSTEPS); 
+  zAxisMotor.begin(Z_AXIS_RPM, MICROSTEPS);
+  plungerMotor.begin(PLUNGER_RPM, MICROSTEPS);
+
   //rackMotor.setSpeedProfile(BasicStepperDriver::LINEAR_SPEED, 1000, 1000); 
 
   //pinMode(LED_PIN, OUTPUT);
@@ -35,11 +50,13 @@ void loop() {
     case 1:{
       Serial.println("Movi1ng left...");
       rackMotor.move(-800); // Move left by 800 microsteps
+      zAxisMotor.move(-800); 
       break;
     }
     case 2:{
       Serial.println("Moving right...");
       rackMotor.move(800); // Move right by 800 microsteps
+      zAxisMotor.move(800);
       break;
     }
     case 3:{
@@ -49,6 +66,7 @@ void loop() {
       Serial.print(steps);
       Serial.println(" microsteps...");
       rackMotor.move(steps);
+      zAxisMotor.move(steps);
       break;
     }
     default:{
