@@ -4,7 +4,7 @@
 #define RACK_STEPS 200
 #define RACK_DIR_PIN 8
 #define RACK_STEP_PIN 9
-#define RACK_RPM 60
+#define RACK_RPM 30
 
 // Board is 1/4 microstepping by default
 #define MICROSTEPS 4
@@ -33,7 +33,7 @@ void loop() {
 
   switch (choice) {
     case 1:{
-      Serial.println("Moving left...");
+      Serial.println("Movi1ng left...");
       rackMotor.move(-800); // Move left by 800 microsteps
       break;
     }
