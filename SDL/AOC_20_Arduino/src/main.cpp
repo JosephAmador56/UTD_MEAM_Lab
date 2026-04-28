@@ -25,7 +25,20 @@ DRV8834 plungerMotor(PLUNGER_STEPS, PLUNGER_DIR_PIN, PLUNGER_STEP_PIN);
 
 #define LED_PIN 13
 
+// Utility
 int waitReadInt();
+void readOption();
+
+// Control Functions
+int homeInjector();
+int nextVial();
+int prevVial();
+int lowerSyringe();
+int raiseSyringe();
+int fillPlunger();
+int dispensePlunger();
+int moveRackManual();
+
 
 void setup() {
   Serial.begin(9600);
@@ -39,43 +52,55 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("Please selected an option:");
-  Serial.println("1. Move left 800 microsteps");
-  Serial.println("2. Move right 800 microsteps");
-  Serial.println("3. Move X microsteps");
+  Serial.println("=== Injector Control Menu ===");
+  Serial.println("Select category:");
+  Serial.println("1. Rack Control");
+  Serial.println("2. Syringe Control");
+  Serial.println("3. Plunger Control");
+  Serial.println("4. Manual Control");
 
-  int choice = waitReadInt();
+  int cntrl_choice = waitReadInt();
+  int option = -1;
 
-  switch (choice) {
+  switch (cntrl_choice) {
     case 1:{
-      Serial.println("Movi1ng left...");
-      rackMotor.move(-800); // Move left by 800 microsteps
-      zAxisMotor.move(-800); 
-      plungerMotor.move(-800); 
+      Serial.println("--- Rack Control ---");
+      Serial.println("1. Home Injector");
+      Serial.println("2. Next Vial");
+      Serial.println("3. Previous Vial");
+      Serial.println("4. Move Manual Steps");
+      option = waitReadInt();
       break;
     }
     case 2:{
-      Serial.println("Moving right...");
-      rackMotor.move(800); // Move right by 800 microsteps
-      zAxisMotor.move(800);
-      plungerMotor.move(800); 
+      Serial.println("--- Syringe Control ---");
+      Serial.println("1. Lower");
+      Serial.println("2. Raise");
+      option = waitReadInt();
       break;
     }
     case 3:{
-      Serial.println("Enter number of microsteps to move (positive for right, negative for left):");
-      int steps = waitReadInt();
-      Serial.print("Moving ");
-      Serial.print(steps);
-      Serial.println(" microsteps...");
-      rackMotor.move(steps);
-      zAxisMotor.move(steps);
-      plungerMotor.move(steps);
+      Serial.println("--- Plunger Control ---");
+      Serial.println("1. Fill");
+      Serial.println("2. Dispense");
+      option = waitReadInt();
+      break;
+    }
+    case 4:{
+      Serial.println("--- Manual Control ---");
+      Serial.println("1. Fill");
+      Serial.println("2. Dispense");
+      option = waitReadInt();
       break;
     }
     default:{
       Serial.println("Invalid option. Please try again.");
     }
   }
+
+
+  
+
 }
 
 int waitReadInt() {
@@ -98,4 +123,8 @@ int waitReadInt() {
   }
 
   return input.toInt();
+}
+
+void readOption() {
+
 }
