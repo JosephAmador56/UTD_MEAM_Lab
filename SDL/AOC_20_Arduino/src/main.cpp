@@ -14,7 +14,7 @@
 #define RACK_RPM 30
 #define RACK_MM_PER_MICROSTEP 0.04345 // mm / microstep
 #define RACK_VIAL_SPACING 9.5 // mm
-#define RACK_STEPS_PER_VIAL (RACK_VIAL_SPACING / RACK_MM_PER_MICROSTEP)
+#define RACK_STEPS_PER_VIAL lround(RACK_VIAL_SPACING / RACK_MM_PER_MICROSTEP)
 int rack_position = 0; // in microsteps, 0 is the rightmost vial position
 
 #define Z_AXIS_STEPS 200 // Fullsteps / revolution
@@ -23,9 +23,9 @@ int rack_position = 0; // in microsteps, 0 is the rightmost vial position
 #define Z_AXIS_RPM 30
 #define Z_AXIS_MAX_HEIGHT 100 // mm
 #define Z_AXIS_MM_PER_MICROSTEP 0.0875 // mm / microstep
-#define Z_AXIS_MAX_STEPS (Z_AXIS_MAX_HEIGHT / Z_AXIS_MM_PER_MICROSTEP)
+#define Z_AXIS_MAX_STEPS lround(Z_AXIS_MAX_HEIGHT / Z_AXIS_MM_PER_MICROSTEP)
 #define Z_AXIS_MIN_HEIGHT 30 // mm
-#define Z_AXIS_MIN_STEPS (Z_AXIS_MIN_HEIGHT / Z_AXIS_MM_PER_MICROSTEP)
+#define Z_AXIS_MIN_STEPS lround(Z_AXIS_MIN_HEIGHT / Z_AXIS_MM_PER_MICROSTEP)
 int z_axis_position = 0; // in microsteps, 0 is the lowest position
 
 #define PLUNGER_STEPS 200 // Fullsteps / revolution
@@ -34,7 +34,7 @@ int z_axis_position = 0; // in microsteps, 0 is the lowest position
 #define PLUNGER_RPM 30
 #define PLUNGER_MAX_HEIGHT 10 // microLiters
 #define PLUNGER_uL_PER_MICROSTEP 0.0125 // microLiters / microstep
-#define PLUNGER_MAX_STEPS (PLUNGER_MAX_HEIGHT / PLUNGER_uL_PER_MICROSTEP)
+#define PLUNGER_MAX_STEPS lround(PLUNGER_MAX_HEIGHT / PLUNGER_uL_PER_MICROSTEP)
 #define PLUNGER_MIN_STEPS 0 
 int plunger_position = 0; // in microsteps, 0 is the lowest position
 
@@ -47,7 +47,7 @@ DRV8834 plungerMotor(PLUNGER_STEPS, PLUNGER_DIR_PIN, PLUNGER_STEP_PIN);
 #define ENABLE_PIN 7
 
 // Utility
-int waitReadInt();
+float waitReadFloat();
 char waitReadChar();
 void moveZSteps(float steps);
 void movePlungerSteps(float steps);
@@ -55,15 +55,26 @@ bool isHomed;
 bool isEnabled;
 
 // Injector control functions
+
+// Homes the axes by moving them to their known limits. Assumes user manually moves the axes to the home position and confirms by entering 1.
 void homeInjector();
+// Moves the rack right by one vial spacing or a custom amount in mm entered by the user.
 void rackRight();
+// Moves the rack left by one vial spacing or a custom amount in mm entered by the user.
 void rackLeft();
+// Raises the syringe by moving the z-axis upwards. Prompts user to enter 1 to fully raise or 2 to enter a custom amount in mm.
 void lowerSyringe();
+// Lowers the syringe by moving it downwards. Prompts user to enter 1 to fully lower or 2 to enter a custom amount in mm.
 void raiseSyringe();
+// Fills the plunger by moving it upwards. Prompts user to enter 1 to fully fill or 2 to enter a custom amount in uL.
 void fillPlunger();
+// Dispenses the plunger by moving it downwards. Prompts user to enter 1 to fully dispense or 2 to enter a custom amount in uL.
 void dispensePlunger();
+// Enables the stepper drivers by setting the enable pin HIGH. Note that the drivers are disabled by default on startup, they are only enabled once the injector is homed.
 void enableDrivers();
+// Disables the stepper drivers by setting the enable pin LOW.
 void disableDrivers();
+// Prints the current positions of the axes in mm for the rack and z-axis and uL for the plunger.
 void printCurrentPositions();
 
 
@@ -83,7 +94,7 @@ void setup() {
 }
 
 void loop() {
-  Serial.println("=== Injector Manual Control ===");
+  Serial.println("\n=== Injector Manual Control ===");
   Serial.println("H: Home Axes");
   Serial.println("W: Raise Syringe (Z up)");
   Serial.println("S: Lower Syringe (Z down)");
@@ -92,7 +103,7 @@ void loop() {
   Serial.println("R: Fill Plunger");
   Serial.println("F: Dispense Plunger");
   printCurrentPositions();
-  Serial.print("Enter command: ");
+  Serial.println("Enter command: ");
 
   char cntrl_choice = waitReadChar();
 
@@ -134,13 +145,9 @@ void loop() {
       Serial.println("Invalid option. Please try again.");
     }
   }
-
-
-  
-
 }
 
-int waitReadInt() {
+float waitReadFloat() {
   String input = "";
 
   while (true) {
@@ -159,7 +166,7 @@ int waitReadInt() {
     }
   }
 
-  return input.toInt();
+  return input.toFloat();
 }
 
 char waitReadChar() {
@@ -194,18 +201,21 @@ void disableDrivers() {
   isEnabled = false;
 }
 
+
 void homeInjector() {
   Serial.println("Manually move axes to home, then enter 1 to confirm:");
   disableDrivers();
   isHomed = false;
-  if (waitReadInt() == 1) {
+  if (waitReadFloat() == 1) {
     isHomed = true;
     rack_position = 0;
     z_axis_position = Z_AXIS_MAX_STEPS;
     plunger_position = 0;
     Serial.println("Homed.");
     enableDrivers();
+    return;
   }
+  Serial.println("Homing cancelled.");
 }
 
 void moveZSteps(float steps) {
@@ -245,62 +255,68 @@ void movePlungerSteps(float steps) {
 
 void raiseSyringe() {
   Serial.println("Enter 1 to fully raise syringe, 2 for custom amount:");
-  int choice = waitReadInt();
+  int choice = waitReadFloat();
 
   if (choice == 1) {
-    moveZSteps((Z_AXIS_MAX_STEPS - z_axis_position));
+    Serial.println("Moving...");
+    moveZSteps(lround(Z_AXIS_MAX_STEPS - z_axis_position));
   } 
   else if (choice == 2) {
     Serial.println("Enter raise amount in mm:");
-    float mm = waitReadInt();
+    float mm = waitReadFloat();
 
     if (mm <= 0) {
       Serial.println("Error: Enter positive value.");
       return;
     }
 
-    moveZSteps(mm / Z_AXIS_MM_PER_MICROSTEP);
+    Serial.println("Moving...");
+    moveZSteps(lround(mm / Z_AXIS_MM_PER_MICROSTEP));
   }
 }
 
 void lowerSyringe() {
   Serial.println("Enter 1 to fully lower syringe, 2 for custom amount:");
-  int choice = waitReadInt();
+  int choice = waitReadFloat();
 
   if (choice == 1) {
-    moveZSteps(-z_axis_position);
+    Serial.println("Moving...");
+    moveZSteps(lround(Z_AXIS_MIN_STEPS - z_axis_position));
   } 
   else if (choice == 2) {
     Serial.println("Enter lower amount in mm:");
-    float mm = waitReadInt();
+    float mm = waitReadFloat();
 
     if (mm <= 0) {
       Serial.println("Error: Enter positive value.");
       return;
     }
 
-    moveZSteps(-mm / Z_AXIS_MM_PER_MICROSTEP);
+    Serial.println("Moving...");
+    moveZSteps(-lround(mm / Z_AXIS_MM_PER_MICROSTEP));
   }
 }
 
 void rackRight() {
   Serial.println("Enter 1 to move right one vial, 2 for custom amount:");
-  int choice = waitReadInt();
+  int choice = waitReadFloat();
 
   if (choice == 1) {
+    Serial.println("Moving...");
     rackMotor.move(RACK_STEPS_PER_VIAL);
     rack_position += RACK_STEPS_PER_VIAL;
   } 
   else if (choice == 2) {
     Serial.println("Enter move amount in mm:");
-    float mm = waitReadInt();
+    float mm = waitReadFloat();
 
     if (mm <= 0) {
       Serial.println("Error: Enter positive value.");
       return;
     }
 
-    long steps = mm / RACK_MM_PER_MICROSTEP;
+    Serial.println("Moving...");
+    long steps = lround(mm / RACK_MM_PER_MICROSTEP);
     rackMotor.move(steps);
     rack_position += steps;
   }
@@ -308,22 +324,24 @@ void rackRight() {
 
 void rackLeft() {
   Serial.println("Enter 1 to move left one vial, 2 for custom amount:");
-  int choice = waitReadInt();
+  int choice = waitReadFloat();
 
   if (choice == 1) {
+    Serial.println("Moving...");
     rackMotor.move(-RACK_STEPS_PER_VIAL);
     rack_position -= RACK_STEPS_PER_VIAL;
   } 
   else if (choice == 2) {
     Serial.println("Enter move amount in mm:");
-    float mm = waitReadInt();
+    float mm = waitReadFloat();
 
     if (mm <= 0) {
       Serial.println("Error: Enter positive value.");
       return;
     }
 
-    long steps = mm / RACK_MM_PER_MICROSTEP;
+    Serial.println("Moving...");
+    long steps = lround(mm / RACK_MM_PER_MICROSTEP);
     rackMotor.move(-steps);
     rack_position -= steps;
   }
@@ -331,40 +349,44 @@ void rackLeft() {
 
 void fillPlunger() {
   Serial.println("Enter 1 to fully fill plunger, 2 for custom amount:");
-  int choice = waitReadInt();
+  int choice = waitReadFloat();
 
   if (choice == 1) {
-    movePlungerSteps((PLUNGER_MAX_STEPS - plunger_position));
+    Serial.println("Filling...");
+    movePlungerSteps(lround(PLUNGER_MAX_STEPS - plunger_position));
   } 
   else if (choice == 2) {
     Serial.println("Enter fill amount in uL:");
-    float uL = waitReadInt();
+    float uL = waitReadFloat();
 
     if (uL <= 0) {
       Serial.println("Error: Enter positive value.");
       return;
     }
 
-    movePlungerSteps(uL / PLUNGER_uL_PER_MICROSTEP);
+    Serial.println("Filling...");
+    movePlungerSteps(lround(uL / PLUNGER_uL_PER_MICROSTEP));
   }
 }
 
 void dispensePlunger() {
   Serial.println("Enter 1 to fully dispense plunger, 2 for custom amount:");
-  int choice = waitReadInt();
+  int choice = waitReadFloat();
 
   if (choice == 1) {
-    movePlungerSteps(-plunger_position);
+    Serial.println("Dispensing...");
+    movePlungerSteps(lround(PLUNGER_MIN_STEPS - plunger_position));
   } 
   else if (choice == 2) {
     Serial.println("Enter dispense amount in uL:");
-    float uL = waitReadInt();
+    float uL = waitReadFloat();
 
     if (uL <= 0) {
       Serial.println("Error: Enter positive value.");
       return;
     }
 
-    movePlungerSteps(-uL / PLUNGER_uL_PER_MICROSTEP);
+    Serial.println("Dispensing...");
+    movePlungerSteps(-lround(uL / PLUNGER_uL_PER_MICROSTEP));
   }
 }
