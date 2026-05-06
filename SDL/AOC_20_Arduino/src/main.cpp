@@ -20,18 +20,18 @@ int rack_position = 0; // in microsteps, 0 is the rightmost vial position
 #define Z_AXIS_STEPS 200 // Fullsteps / revolution
 #define Z_AXIS_DIR_PIN 12
 #define Z_AXIS_STEP_PIN 10
-#define Z_AXIS_RPM 30
-#define Z_AXIS_MAX_HEIGHT 100 // mm
+#define Z_AXIS_RPM 15
+#define Z_AXIS_MAX_HEIGHT 125 // mm
 #define Z_AXIS_MM_PER_MICROSTEP 0.0875 // mm / microstep
 #define Z_AXIS_MAX_STEPS lround(Z_AXIS_MAX_HEIGHT / Z_AXIS_MM_PER_MICROSTEP)
-#define Z_AXIS_MIN_HEIGHT 30 // mm
+#define Z_AXIS_MIN_HEIGHT 85 // mm
 #define Z_AXIS_MIN_STEPS lround(Z_AXIS_MIN_HEIGHT / Z_AXIS_MM_PER_MICROSTEP)
 int z_axis_position = 0; // in microsteps, 0 is the lowest position
 
 #define PLUNGER_STEPS 200 // Fullsteps / revolution
 #define PLUNGER_DIR_PIN 13
 #define PLUNGER_STEP_PIN 11
-#define PLUNGER_RPM 30
+#define PLUNGER_RPM 10
 #define PLUNGER_MAX_HEIGHT 10 // microLiters
 #define PLUNGER_uL_PER_MICROSTEP 0.0125 // microLiters / microstep
 #define PLUNGER_MAX_STEPS lround(PLUNGER_MAX_HEIGHT / PLUNGER_uL_PER_MICROSTEP)
@@ -86,7 +86,9 @@ void setup() {
 
   isHomed = false;
 
-  //rackMotor.setSpeedProfile(BasicStepperDriver::LINEAR_SPEED, 1000, 1000); 
+  rackMotor.setSpeedProfile(BasicStepperDriver::LINEAR_SPEED, 250, 250);
+  zAxisMotor.setSpeedProfile(BasicStepperDriver::LINEAR_SPEED, 250, 250); 
+  plungerMotor.setSpeedProfile(BasicStepperDriver::LINEAR_SPEED, 100, 100); 
 
   //pinMode(LED_PIN, OUTPUT);
   pinMode(ENABLE_PIN, OUTPUT);
@@ -155,7 +157,7 @@ float waitReadFloat() {
       char c = Serial.read();
 
       // Enter key pressed
-      if (c == '\n') {
+      if (c == '\n' || c == '\r') {
         break;
       }
 
@@ -231,7 +233,7 @@ void moveZSteps(float steps) {
     return;
   }
 
-  zAxisMotor.move(steps);
+  zAxisMotor.move(-steps);
   z_axis_position = new_position;
 }
 
