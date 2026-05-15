@@ -12,7 +12,9 @@
 #define RACK_DIR_PIN 8
 #define RACK_STEP_PIN 9
 #define RACK_RPM 30
-#define RACK_MM_PER_MICROSTEP 0.04345 // mm / microstep
+#define RACK_MICROSTEPS 4
+#define RACK_MM_PER_STEP 0.1738 // mm / step
+#define RACK_MM_PER_MICROSTEP RACK_MM_PER_STEP / RACK_MICROSTEPS // mm / microstep
 #define RACK_VIAL_SPACING 9.5 // mm
 #define RACK_STEPS_PER_VIAL lround(RACK_VIAL_SPACING / RACK_MM_PER_MICROSTEP)
 int rack_position = 0; // in microsteps, 0 is the rightmost vial position
@@ -22,7 +24,9 @@ int rack_position = 0; // in microsteps, 0 is the rightmost vial position
 #define Z_AXIS_STEP_PIN 10
 #define Z_AXIS_RPM 15
 #define Z_AXIS_MAX_HEIGHT 125 // mm
-#define Z_AXIS_MM_PER_MICROSTEP 0.0875 // mm / microstep
+#define Z_AXIS_MICROSTEPS 4
+#define Z_AXIS_MM_PER_STEP 0.35 // mm / step
+#define Z_AXIS_MM_PER_MICROSTEP Z_AXIS_MM_PER_STEP / Z_AXIS_MICROSTEPS // mm / microstep
 #define Z_AXIS_MAX_STEPS lround(Z_AXIS_MAX_HEIGHT / Z_AXIS_MM_PER_MICROSTEP)
 #define Z_AXIS_MIN_HEIGHT 85 // mm
 #define Z_AXIS_MIN_STEPS lround(Z_AXIS_MIN_HEIGHT / Z_AXIS_MM_PER_MICROSTEP)
@@ -33,7 +37,9 @@ int z_axis_position = 0; // in microsteps, 0 is the lowest position
 #define PLUNGER_STEP_PIN 11
 #define PLUNGER_RPM 10
 #define PLUNGER_MAX_HEIGHT 10 // microLiters
-#define PLUNGER_uL_PER_MICROSTEP 0.0125 // microLiters / microstep
+#define PLUNGER_MICROSTEPS 4
+#define PLUNGER_MM_PER_STEP 0.05 // microLiters / step
+#define PLUNGER_uL_PER_MICROSTEP PLUNGER_MM_PER_STEP / PLUNGER_MICROSTEPS // microLiters / microstep
 #define PLUNGER_MAX_STEPS lround(PLUNGER_MAX_HEIGHT / PLUNGER_uL_PER_MICROSTEP)
 #define PLUNGER_MIN_STEPS 0 
 int plunger_position = 0; // in microsteps, 0 is the lowest position
